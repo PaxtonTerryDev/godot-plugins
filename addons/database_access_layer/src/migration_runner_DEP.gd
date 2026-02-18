@@ -1,4 +1,4 @@
-class_name MigrationRunner extends RefCounted
+class_name MigrationRunner extends Node
 
 # TODO: Godot Sqlite ships with a backup_to and restore_from method.  We should use these to ensure we don't end up corrupting player data on accident during a migration after a patch 
 # TODO: Need to implement either rollbacks or transactions when applying the migrations

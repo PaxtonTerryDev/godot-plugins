@@ -19,10 +19,15 @@ var db: SQLite = null
 @export var db_subdirectory_name: String = "database"
 @export var db_migrations_subdirectory_name: String = "migrations"
 
-@export_category("Settings")
+@export_category("General Settings")
 @export var verbosity_level: Verbosity
 @export var enable_foreign_keys: bool = true
 @export var read_only: bool = false
+
+@export_group("Process Settings")
+@export_subgroup("Threading", "use_thread_for")
+@export var use_thread_for_writes: bool = true
+@export var use_thread_for_reads: bool = false
 
 func _enter_tree() -> void:
 	assert(_open_connection(), "connection to the internal database failed")
@@ -102,9 +107,10 @@ func _test_connection() -> bool:
 
 func _check_and_run_migrations() -> bool:
 	var runner = MigrationRunner.new(db, _get_db_migrations_dir())
-	runner.run()
-	# FIX: This is always returning true
-	return true
+	add_child(runner)
+	var result = runner.run()
+	runner.queue_free()
+	return result
 
 func begin_transaction() -> bool:
 	return db.query("BEGIN;")
@@ -122,4 +128,22 @@ func _execute_transaction(transaction: DatabaseTransaction) -> bool:
 			rollback_transaction()
 			return false
 	commit_transaction()
+	return true
+
+signal threaded_write_started(transaction_id: String)
+signal threaded_write_completed(transaction_id: String)
+
+var _write_thread: Thread
+
+signal threaded_read_started(transaction_id: String)
+signal threaded_read_completed(transaction_id: String)
+
+var _read_thread: Thread
+
+func _initialize_threads() -> void:
+	if use_thread_for_writes: _write_thread = Thread.new()
+	if use_thread_for_reads: _read_thread = Thread.new()
+
+## Executes a database transaction asynchronously using a separate thread.
+func _execute_threaded_transaction(transaction: DatabaseTransaction) -> bool:
 	return true
