@@ -23,7 +23,7 @@ Database="*uid://xr6vn366d0xe"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/application_environment/plugin.cfg", "res://addons/data_structures/plugin.cfg", "res://addons/database_access_layer/plugin.cfg", "res://addons/dialogue/plugin.cfg", "res://addons/godot-sqlite/plugin.cfg", "res://addons/logger/plugin.cfg")
+enabled=PackedStringArray("res://addons/application_environment/plugin.cfg", "res://addons/data_structures/plugin.cfg", "res://addons/database_access_layer/plugin.cfg", "res://addons/dialogue/plugin.cfg", "res://addons/godot-sqlite/plugin.cfg", "res://addons/logger/plugin.cfg", "res://addons/uuid/plugin.cfg")
 
 [physics]
 
