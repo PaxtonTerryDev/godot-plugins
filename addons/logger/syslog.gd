@@ -1,6 +1,10 @@
 class_name Syslog extends RefCounted
 
+const _MAX_LEVEL_LEN: int = 8  # length of "[ERROR] "
+static var _max_scope_display_len: int = 0
+
 var scopes: Dictionary[String, bool] = {}
+var normalize: bool = true
 
 func format_scope() -> String:
 	var active_scopes: Array[String] = []
@@ -8,11 +12,12 @@ func format_scope() -> String:
 		if scopes[scope]: active_scopes.push_back(scope)
 	return "|".join(active_scopes)
 
-## Add a new scopes to the logger.  This is appended to the current scopes
+## Add a new scope to the logger.  This is appended to the current scopes
 func add_scope(new_scope: String) -> void:
 	scopes.set(new_scope, true)
+	_update_max_scope_len()
 
-## Permanently remove the target scopes from the logger.
+## Permanently remove the target scope from the logger.
 func remove_scope(target_scope: String) -> void:
 	scopes.erase(target_scope)
 
@@ -25,15 +30,29 @@ func enable_scope(target_scope: String) -> void:
 func temp_scope(_temp_scope: String) -> Syslog:
 	var t = Syslog.new()
 	t.scopes = scopes.duplicate()
-	t.add_scope(_temp_scope)
+	t.normalize = normalize
+	t.scopes.set(_temp_scope, true)  # bypass add_scope — temp scopes don't affect global max
 	return t
+
+func _update_max_scope_len() -> void:
+	var all_keys: Array = scopes.keys()
+	if all_keys.is_empty(): return
+	var candidate: int = ("(%s)  " % "|".join(all_keys)).length()
+	if candidate > _max_scope_display_len:
+		_max_scope_display_len = candidate
 
 ## Returns a formatted log string
 func format_log(_level: String = "", _message: String = "") -> String:
 	var _scope = format_scope()
 	var formatted_message = ""
-	if _level.length() > 0: formatted_message += "[%s] " % _level
-	if _scope.length() > 0: formatted_message += "(%s) " % _scope
+	if normalize:
+		var level_part = "[%s] " % _level if _level.length() > 0 else ""
+		formatted_message += level_part.rpad(_MAX_LEVEL_LEN)
+		var scope_part = "(%s)  " % _scope if _scope.length() > 0 else ""
+		formatted_message += scope_part.rpad(_max_scope_display_len)
+	else:
+		if _level.length() > 0: formatted_message += "[%s] " % _level
+		if _scope.length() > 0: formatted_message += "(%s)  " % _scope
 	formatted_message += _message
 	return formatted_message
 
@@ -66,3 +85,5 @@ func error(message: String, push_error: bool = true, spacer: bool = false) -> vo
 func _init(initial_scopes: PackedStringArray = []) -> void:
 	for s in initial_scopes:
 		scopes.set(s, true)
+	if not scopes.is_empty():
+		_update_max_scope_len()
