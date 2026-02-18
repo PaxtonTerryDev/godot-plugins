@@ -1,3 +1,5 @@
+## Facilitates connections to an embedded sqlite instance. 
+## Responsible for issuing and managing connections and threads
 extends Node
 
 # Just some general notes - 
@@ -13,26 +15,24 @@ enum Verbosity {
 	VERY_VERBOSE = 3
 }
 
-var db: SQLite = null
-@export_group("File and Directory Names", "db_")
-@export var db_filename: String = "sqlite"
+enum ConnectionType {
+	READ,
+	WRITE,
+}
+
+@export var db_name: String = "sqlite"
 @export var db_subdirectory_name: String = "database"
 @export var db_migrations_subdirectory_name: String = "migrations"
 
-@export_category("General Settings")
-@export var verbosity_level: Verbosity
-@export var enable_foreign_keys: bool = true
-@export var read_only: bool = false
+@export var default_context: DatabaseConnectionContext
 
-@export_group("Process Settings")
-@export_subgroup("Threading", "use_thread_for")
-@export var use_thread_for_writes: bool = true
-@export var use_thread_for_reads: bool = false
+@export var initial_read_connections: int = 4
 
-func _enter_tree() -> void:
-	assert(_open_connection(), "connection to the internal database failed")
-	_check_and_run_migrations()
-
+func _ready() -> void:
+	initialize_default_connections()
+######################################################################
+# General Utilities
+######################################################################
 func is_dev() -> bool:
 	return OS.has_feature("editor")
 
@@ -45,105 +45,81 @@ const PROD_DATA_DIR: String = "user://"
 func get_data_dir_path() -> String:
 	return DEV_DATA_DIR if is_dev() else PROD_DATA_DIR
 
-func _exit_tree() -> void:
-	_close_connection()
-
-func _get_db_dir() -> String:
-	var dir = Application.get_data_dir_path().path_join(db_subdirectory_name)
+func get_db_dir() -> String:
+	var dir = get_data_dir_path().path_join(db_subdirectory_name)
 	DirAccess.make_dir_recursive_absolute(dir)
 	return dir
 
-func _get_db_path() -> String:
-	var base_path = _get_db_dir()
-	return base_path.path_join(db_filename)
+func get_db_path() -> String:
+	var base_path = get_db_dir()
+	return base_path.path_join(db_name)
 
-func _get_db_migrations_dir() -> String:
+func get_db_migrations_dir() -> String:
 	var dir = "res://addons/database_access_layer".path_join(db_migrations_subdirectory_name)
 	DirAccess.make_dir_recursive_absolute(dir)
 	return dir
 
-func _get_db_backup_path() -> String:
+func get_db_backup_path() -> String:
 	var base_path = Database._get_db_tmp_dir().path_join("backup")
 	DirAccess.make_dir_recursive_absolute(base_path)
 	return base_path.path_join("%s_bkp")
 
-func _get_db_tmp_dir() -> String:
-	var path: String = _get_db_dir().path_join("tmp")
+func get_db_tmp_dir() -> String:
+	var path: String = get_db_dir().path_join("tmp")
 	DirAccess.make_dir_recursive_absolute(path)
 	return path
 
-func _open_connection() -> bool:
-	db = SQLite.new()
-	var path = _get_db_path()
-	logger.info("opening database connection")
-	db.path = path
-	db.verbosity_level = verbosity_level
-	db.foreign_keys = enable_foreign_keys
-	db.read_only = read_only
-	var result = db.open_db()
-	if result: logger.info("database connection to %s successful" % path)
-	else: logger.error("database to %s connection failed" % path)
-	return result
+#######################################################################
+# Connection Management
+######################################################################
 
-func _close_connection() -> bool:
-	logger.info("closing database connection")
-	if db == null:
-		logger.warn("attempted to close database connection, but none exist")
+func initialize_default_connections() -> bool:
+	var write_connection = _create_connection(Database.ConnectionType.WRITE).open_database_connection()
+	if !write_connection: 
+		logger.error("failed to initialize write connection to database")
 		return false
-	return db.close_db()
-
-func _ensure_connection() -> void:
-	logger.info("verifying sqlite connection")
-	db = SQLite.new()
-	db.path = _get_db_path()
-	db.verbosity_level = SQLite.VERBOSE
-	_test_connection()
-
-func _test_connection() -> bool:
-	db.open_db()
-	var result = db.query("SELECT name FROM sqlite_master WHERE type='table';")
-	db.close_db()
-	return result
-
-func _check_and_run_migrations() -> bool:
-	var runner = MigrationRunner.new(db, _get_db_migrations_dir())
-	add_child(runner)
-	var result = runner.run()
-	runner.queue_free()
-	return result
-
-func begin_transaction() -> bool:
-	return db.query("BEGIN;")
-
-func rollback_transaction() -> bool:
-	return db.query("ROLLBACK;")
-
-func commit_transaction() -> bool:
-	return db.query("COMMIT:")
-
-func _execute_transaction(transaction: DatabaseTransaction) -> bool:
-	begin_transaction()
-	for statement in transaction.statements:
-		if !db.query(statement):
-			rollback_transaction()
+	for i in range(initial_read_connections):
+		var read_connection
+		if !read_connection: 
+			logger.error("failed to initialize read connection to database")
 			return false
-	commit_transaction()
 	return true
 
-signal threaded_write_started(transaction_id: String)
-signal threaded_write_completed(transaction_id: String)
+signal connection_taken(requestor: Node, connection_id: String)
+signal connection_released(connection_id: String)
 
-var _write_thread: Thread
+# This will have a thread that basically pops the query, executes it and then returns
+# If thie nodes are living in scene tree, I need to figure out a way to prevent them from being accessed while the runner is accessing it. Actually, maybe the mutex lives inside of the query itself, since we just need to handle the response internally
+var requestor_queue: Array[DatabaseQuery] = []
 
-signal threaded_read_started(transaction_id: String)
-signal threaded_read_completed(transaction_id: String)
+var available_connections: Dictionary[Database.ConnectionType, Dictionary] = {
+	Database.ConnectionType.READ: {},
+	Database.ConnectionType.WRITE: {},
+	}
 
-var _read_thread: Thread
+var in_use_connections: Dictionary[Database.ConnectionType, Dictionary] = {
+	Database.ConnectionType.READ: {},
+	Database.ConnectionType.WRITE: {},
+	}
 
-func _initialize_threads() -> void:
-	if use_thread_for_writes: _write_thread = Thread.new()
-	if use_thread_for_reads: _read_thread = Thread.new()
+func is_connection_available(type: Database.ConnectionType) -> bool:
+	return available_connections[type].keys().size() > 0
 
-## Executes a database transaction asynchronously using a separate thread.
-func _execute_threaded_transaction(transaction: DatabaseTransaction) -> bool:
-	return true
+func request_connection(requestor: DatabaseQuery) -> void:
+	requestor_queue.push_back(requestor)
+
+func _create_connection(type: Database.ConnectionType = Database.ConnectionType.READ, context: DatabaseConnectionContext = default_context) -> DatabaseConnection:
+	var c = DatabaseConnection.create(context, type)
+	add_child(c, true)
+	available_connections[type][c.id] = c
+	return c
+
+#
+# func _check_and_run_migrations() -> bool:
+# 	var runner = MigrationRunnerDEP.new(db, _get_db_migrations_dir())
+# 	add_child(runner)
+# 	var result = runner.run()
+# 	runner.queue_free()
+# 	return result
+#
+

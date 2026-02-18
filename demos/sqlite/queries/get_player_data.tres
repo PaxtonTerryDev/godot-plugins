@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="DatabaseSelectOneQuery" format=3 uid="uid://ctifg0jx1pdof"]
+
+[ext_resource type="Script" uid="uid://dym7m1o1opl0u" path="res://addons/database_access_layer/src/queries/select_one.gd" id="1_i10fj"]
+
+[resource]
+script = ExtResource("1_i10fj")
+metadata/_custom_type_script = "uid://dym7m1o1opl0u"

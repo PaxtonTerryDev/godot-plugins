@@ -1,4 +1,4 @@
-class_name UUIDGenerator
+class_name UUID
 extends RefCounted
 
 ## A utility class for generating UUID version 4 (random) identifiers

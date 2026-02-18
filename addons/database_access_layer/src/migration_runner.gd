@@ -1,8 +1,8 @@
-class_name MigrationRunner extends Node
+class_name MigrationRunnerDEP extends Node
 
 # TODO: Godot Sqlite ships with a backup_to and restore_from method.  We should use these to ensure we don't end up corrupting player data on accident during a migration after a patch 
 # TODO: Need to implement either rollbacks or transactions when applying the migrations
-var logger = Syslog.new(["Database", "MigrationRunner"])
+var logger = Syslog.new(["Database", "MigrationRunnerDEP"])
 var _db: SQLite
 var _migrations_dir: String
 
