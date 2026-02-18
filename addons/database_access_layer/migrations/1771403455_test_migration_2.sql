@@ -1,0 +1,1 @@
+ALTER TABLE game_saves ADD COLUMN version TEXT NOT NULL DEFAULT '0.0.0';

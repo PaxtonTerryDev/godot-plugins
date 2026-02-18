@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS game_saves (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL DEFAULT '',
+    last_save INTEGER NOT NULL DEFAULT 0
+);

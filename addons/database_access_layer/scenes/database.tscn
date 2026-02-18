@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://xr6vn366d0xe"]
+
+[ext_resource type="Script" uid="uid://dc6u7u8g86wua" path="res://addons/database_access_layer/src/database.gd" id="1_8cgem"]
+
+[node name="Database" type="Node" unique_id=1129976745]
+script = ExtResource("1_8cgem")

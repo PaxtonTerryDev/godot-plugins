@@ -3,7 +3,7 @@ extends EditorPlugin
 
 const autoload: Dictionary = {
 	"name": "Database",
-	"path": "src/database.gd"
+	"path": "res://addons/database_access_layer/scenes/database.tscn"
 	}
 
 func _enable_plugin() -> void:
