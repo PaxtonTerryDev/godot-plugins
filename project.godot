@@ -24,12 +24,16 @@ Daytimer="*uid://csd42jwl368tr"
 
 [display]
 
-window/size/viewport_width=640
-window/size/viewport_height=360
+window/size/viewport_width=320
+window/size/viewport_height=180
+window/size/window_width_override=1280
+window/size/window_height_override=720
+window/stretch/mode="viewport"
+window/stretch/scale_mode="integer"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/abilities/plugin.cfg", "res://addons/application_environment/plugin.cfg", "res://addons/controller/plugin.cfg", "res://addons/data_structures/plugin.cfg", "res://addons/database_access_layer/plugin.cfg", "res://addons/day_night_cycle/plugin.cfg", "res://addons/dialogue/plugin.cfg", "res://addons/godot-sqlite/plugin.cfg", "res://addons/logger/plugin.cfg", "res://addons/uuid/plugin.cfg")
+enabled=PackedStringArray("res://addons/abilities/plugin.cfg", "res://addons/application_environment/plugin.cfg", "res://addons/controller/plugin.cfg", "res://addons/data_structures/plugin.cfg", "res://addons/database_access_layer/plugin.cfg", "res://addons/day_night_cycle/plugin.cfg", "res://addons/dialogue/plugin.cfg", "res://addons/godot-sqlite/plugin.cfg", "res://addons/hud_menus/plugin.cfg", "res://addons/logger/plugin.cfg", "res://addons/uuid/plugin.cfg")
 
 [physics]
 
@@ -37,6 +41,7 @@ enabled=PackedStringArray("res://addons/abilities/plugin.cfg", "res://addons/app
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"

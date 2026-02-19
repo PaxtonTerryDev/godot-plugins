@@ -1,3 +1,22 @@
 [gd_scene format=3 uid="uid://cwy3567h6kwou"]
 
+[ext_resource type="PackedScene" uid="uid://bptew3s3vk7nn" path="res://addons/hud_menus/scenes/hud_menu.tscn" id="1_ig7tw"]
+
 [node name="Main" type="Node2D" unique_id=68662257]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1904305016]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=581526381]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HUDMenu" parent="CanvasLayer/Control" unique_id=1351806720 instance=ExtResource("1_ig7tw")]
+layout_mode = 1
+offset_left = 84.0
+offset_top = 46.0
+offset_right = -154.0
+offset_bottom = -85.0

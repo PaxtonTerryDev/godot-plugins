@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://bptew3s3vk7nn"]
+
+[ext_resource type="Script" uid="uid://bdax07cpsm51v" path="res://addons/hud_menus/src/hud_menu.gd" id="1_1jgnj"]
+[ext_resource type="Script" uid="uid://ci3munf7wcdg0" path="res://addons/hud_menus/src/drag_component.gd" id="2_j3uso"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_crqv6"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.9411765, 0.9647059, 0.9411765, 1)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_etmpu"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.13333334, 0.13725491, 0.13725491, 1)
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+corner_detail = 5
+
+[node name="HUDMenu" type="Control" unique_id=1351806720]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1jgnj")
+
+[node name="DragComponent" type="Node" parent="." unique_id=781244783 node_paths=PackedStringArray("_controlling", "_handle_control")]
+script = ExtResource("2_j3uso")
+_controlling = NodePath("..")
+_handle_control = NodePath("../HUDPanel/PanelVBoxContainer/HUDTopBar")
+metadata/_custom_type_script = "uid://ci3munf7wcdg0"
+
+[node name="HUDPanel" type="Control" parent="." unique_id=1620250850]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelVBoxContainer" type="VBoxContainer" parent="HUDPanel" unique_id=1353142938]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="HUDTopBar" type="PanelContainer" parent="HUDPanel/PanelVBoxContainer" unique_id=352353187]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_crqv6")
+
+[node name="HUDMenuBody" type="PanelContainer" parent="HUDPanel/PanelVBoxContainer" unique_id=1722256719]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_etmpu")

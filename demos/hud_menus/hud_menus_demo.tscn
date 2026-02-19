@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bly5l2ra5jcrl"]
+
+[ext_resource type="Script" uid="uid://0cle6w5p7t0a" path="res://demos/hud_menus/hud_menus_demo.gd" id="1_b3yd3"]
+
+[node name="HudMenusDemo" type="Node" unique_id=811305588]
+script = ExtResource("1_b3yd3")
