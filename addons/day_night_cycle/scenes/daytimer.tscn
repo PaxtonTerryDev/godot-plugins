@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://csd42jwl368tr"]
+
+[ext_resource type="Script" uid="uid://diucmn6s6226i" path="res://addons/day_night_cycle/src/daytimer.gd" id="1_qnb44"]
+[ext_resource type="Script" uid="uid://b7fkn4asus7h2" path="res://addons/day_night_cycle/src/clock.gd" id="2_mlyf6"]
+
+[node name="Daytimer" type="Node" unique_id=651455412]
+script = ExtResource("1_qnb44")
+
+[node name="Clock" type="Node" parent="." unique_id=28011418]
+script = ExtResource("2_mlyf6")
