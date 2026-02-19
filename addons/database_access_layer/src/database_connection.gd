@@ -1,20 +1,28 @@
 class_name DatabaseConnection extends Node
-var id: String = UUID.generate()
-var type: Database.ConnectionType
+var id: String = UUID.generate_compact()
 var context: DatabaseConnectionContext
-var connection: SQLite
+var db: SQLite
 
-func open_database_connection() -> bool:
-	connection = SQLite.new()
-	connection.path = Database.get_db_path()
-	connection.verbosity = context.verbosity_level
-	connection.foreign_keys = context.foreign_keys
-	connection.read_only = true if type == Database.ConnectionType.READ else false
-	return connection.open_db()
+func open_database_connection(verbosity: Database.Verbosity = Database.Verbosity.NORMAL) -> bool:
+	db = SQLite.new()
+	db.path = Database.get_db_path()
+	db.verbosity_level = verbosity
+	db.foreign_keys = context.foreign_keys
+	db.read_only = context.read_only
 
-static func create(_context: DatabaseConnectionContext = Database.default_context, _type: Database.ConnectionType = Database.ConnectionType.READ) -> DatabaseConnection:
-	var conn = DatabaseConnection.new()
-	conn.type = _type
-	conn.context = _context
-	conn.name = "DatabaseConnection_%s" % conn.id
-	return conn
+	return db.open_db()
+
+func close_database_connection() -> bool:
+	return db.close_db()
+
+static func create(_context: DatabaseConnectionContext = Database.default_context) -> DatabaseConnection:
+	var c = DatabaseConnection.new()
+	c.context = _context
+	c.name = "DatabaseConnection_%s" % c.id
+	return c
+
+func _enter_tree() -> void:
+	open_database_connection()
+
+func _exit_tree() -> void:
+	close_database_connection()

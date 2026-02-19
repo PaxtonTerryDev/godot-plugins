@@ -1,6 +1,13 @@
 [gd_scene format=3 uid="uid://xr6vn366d0xe"]
 
 [ext_resource type="Script" uid="uid://dc6u7u8g86wua" path="res://addons/database_access_layer/src/database.gd" id="1_8cgem"]
+[ext_resource type="Script" uid="uid://imbmpgxdah31" path="res://addons/database_access_layer/src/database_connection_context.gd" id="2_81ecw"]
+
+[sub_resource type="Resource" id="Resource_t0j8v"]
+script = ExtResource("2_81ecw")
+verbosity_level = 1
+metadata/_custom_type_script = "uid://imbmpgxdah31"
 
 [node name="Database" type="Node" unique_id=1129976745]
 script = ExtResource("1_8cgem")
+default_context = SubResource("Resource_t0j8v")
