@@ -95,4 +95,3 @@ func add_query_request(query: DatabaseQuery) -> void:
 
 func get_query() -> DatabaseQuery:
 	return query_queue.pop_front()
-

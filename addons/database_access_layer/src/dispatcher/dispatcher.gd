@@ -14,5 +14,3 @@ func _initialize_threads() -> void:
 
 func _can_dispatch() -> bool:
 	return _threads.size() > 0
-
-

@@ -3,7 +3,8 @@ var id: String = UUID.generate_compact()
 var context: DatabaseConnectionContext
 var db: SQLite
 
-func open_database_connection(verbosity: Database.Verbosity = Database.Verbosity.NORMAL) -> bool:
+# FIX: verbosity configurations are not being provided anywhere -> this will always be the default
+func open_database_connection(verbosity: Database.Verbosity = Database.Verbosity.QUIET) -> bool:
 	db = SQLite.new()
 	db.path = Database.get_db_path()
 	db.verbosity_level = verbosity
