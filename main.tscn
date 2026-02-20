@@ -1,12 +1,30 @@
 [gd_scene format=3 uid="uid://cwy3567h6kwou"]
 
-[ext_resource type="PackedScene" uid="uid://bptew3s3vk7nn" path="res://addons/hud_menus/scenes/hud_menu.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://bptew3s3vk7nn" path="res://addons/hud_menus/scenes/game_window.tscn" id="1_ig7tw"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ig7tw"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.101960786, 0.101960786, 0.101960786, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5803922, 0.07450981, 0, 1)
+border_blend = true
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
 
 [node name="Main" type="Node2D" unique_id=68662257]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1904305016]
 
-[node name="Control" type="Control" parent="CanvasLayer" unique_id=581526381]
+[node name="Control2" type="Control" parent="CanvasLayer" unique_id=170686364]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,9 +32,30 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="HUDMenu" parent="CanvasLayer/Control" unique_id=1351806720 instance=ExtResource("1_ig7tw")]
+[node name="Control" type="Control" parent="CanvasLayer/Control2" unique_id=581526381]
 layout_mode = 1
-offset_left = 84.0
-offset_top = 46.0
-offset_right = -154.0
-offset_bottom = -85.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 169.0
+offset_top = 65.0
+offset_right = -167.0
+offset_bottom = -109.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="CanvasLayer/Control2/Control" unique_id=1126927892]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ig7tw")
+
+[node name="GameWindow" parent="CanvasLayer/Control2/Control" unique_id=1351806720 instance=ExtResource("1_ig7tw")]
+layout_mode = 1
+offset_left = 97.0
+offset_top = 91.0
+offset_right = -79.0
+offset_bottom = -32.0

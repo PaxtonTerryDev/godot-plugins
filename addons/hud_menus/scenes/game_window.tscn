@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bptew3s3vk7nn"]
 
-[ext_resource type="Script" uid="uid://bdax07cpsm51v" path="res://addons/hud_menus/src/hud_menu.gd" id="1_1jgnj"]
+[ext_resource type="Script" uid="uid://juymaiwy7slc" path="res://addons/hud_menus/src/game_window.gd" id="1_j3uso"]
 [ext_resource type="Script" uid="uid://ci3munf7wcdg0" path="res://addons/hud_menus/src/drag_component.gd" id="2_j3uso"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_crqv6"]
@@ -24,19 +24,22 @@ corner_radius_bottom_right = 1
 corner_radius_bottom_left = 1
 corner_detail = 5
 
-[node name="HUDMenu" type="Control" unique_id=1351806720]
+[node name="GameWindow" type="Control" unique_id=702696325 node_paths=PackedStringArray("_top_bar", "_drag_component")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_1jgnj")
+script = ExtResource("1_j3uso")
+_top_bar = NodePath("HUDPanel/PanelVBoxContainer/HUDTopBar")
+_drag_component = NodePath("DragComponent")
 
 [node name="DragComponent" type="Node" parent="." unique_id=781244783 node_paths=PackedStringArray("_controlling", "_handle_control")]
 script = ExtResource("2_j3uso")
 _controlling = NodePath("..")
 _handle_control = NodePath("../HUDPanel/PanelVBoxContainer/HUDTopBar")
+bound_behavior = 1
 metadata/_custom_type_script = "uid://ci3munf7wcdg0"
 
 [node name="HUDPanel" type="Control" parent="." unique_id=1620250850]
